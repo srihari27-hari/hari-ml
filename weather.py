@@ -1,35 +1,21 @@
 import streamlit as st
-import pyowm
-
-# Initialize OpenWeatherMap API
-API_KEY = 'YOUR_API_KEY'  # Replace with your own API key
-owm = pyowm.OWM(API_KEY)
-mgr = owm.weather_manager()
+import requests
 
 # Title of the application
-st.title("Weather Forecast")
+st.title("Random Quote Generator")
 
-# Input field for the city name
-city = st.text_input("Enter the city name:")
-
-# Button to get weather
-if st.button("Get Weather"):
-    if city:
-        try:
-            # Fetch the weather
-            observation = mgr.weather_at_place(city)
-            weather = observation.weather
-            temperature = weather.temperature('celsius')['temp']
-            status = weather.detailed_status
-            
-            # Display the weather information
-            st.success(f"Weather in {city.capitalize()}:")
-            st.write(f"Temperature: {temperature:.1f} °C")
-            st.write(f"Condition: {status.capitalize()}")
-        except:
-            st.error("City not found or an error occurred. Please check the city name.")
-    else:
-        st.error("Please enter a city name.")
+# Button to fetch a random quote
+if st.button("Get Random Quote"):
+    try:
+        # Fetch a random quote from the API
+        response = requests.get("https://api.quotable.io/random")
+        data = response.json()
+        
+        # Display the quote and the author
+        st.subheader(data['content'])
+        st.write(f"— {data['author']}")
+    except Exception as e:
+        st.error(f"Error fetching quote: {str(e)}")
 
 # Footer
-st.write("Powered by Streamlit & OpenWeatherMap")
+st.write("Powered by Streamlit & Quotable API")
